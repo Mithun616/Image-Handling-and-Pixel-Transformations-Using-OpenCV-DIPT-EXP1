@@ -107,33 +107,18 @@ img_bgr2.shape
 
 #### 11. Add the following text to the dark area at the bottom of the image (centered on the image):
 ```python
-text = 'Apollo 11 Saturn V Launch, July 16, 1969'
-font_face = cv2.FONT_HERSHEY_PLAIN
-font_scale = 2
-thickness = 2
-color = (255, 255, 255)  
-h, w = img_bgr2.shape[:2]
-(text_width, text_height), _ = cv2.getTextSize(text, font_face, font_scale, thickness)
-
-x = (w - text_width) // 2
-y = h - 20  
-cv2.putText(img_bgr2, text, (x, y), font_face, font_scale, color, thickness)
-
-import matplotlib.pyplot as plt
-plt.imshow(img_bgr2[:,:,::-1])
-plt.axis("off")
-plt.title("Apollo 11 Launch with Text")
-plt.show()
+text = "Apollo 11 Saturn V Launch, July 16, 1969"
+ApolloText = cv2.putText(img_bgr2, text, (300, 690), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 3)
+plt.imshow(ApolloText)
 ```
 
 #### 12. Draw a magenta rectangle that encompasses the launch tower and the rocket.
 ```python
-# rect_color = magenta
-rect_color = (255, 0, 255)
-top_left = (200, 50)
-bottom_right = (600, 700)
-
-cv2.rectangle(img_bgr2, top_left, bottom_right, rect_color, 3)
+cv2.rectangle(ApolloText, (450,50), (750,700), (255,0,255), 3)
+plt.imshow(img_bgr2[:,:,::-1]) 
+plt.title("Final Annotated Image")
+plt.axis("off")
+plt.show()
 ```
 
 #### 13. Display the final annotated image.
@@ -146,8 +131,9 @@ plt.show()
 
 #### 14. Read the image ('Boy.jpg').
 ```python
-img_bgr3 = cv2.imread("boy.jpg")
-img_bgr3.shape
+img_bgr3 = cv2.imread("Boy.jpg", cv2.IMREAD_COLOR)
+BoyColor = cv2.cvtColor(Boy, cv2.COLOR_BGR2RGB)
+plt.imshow(BoyColor)
 ```
 
 #### 15. Adjust the brightness of the image.
@@ -161,87 +147,38 @@ plt.imshow(img_bright[:,:,::-1])
 plt.title("Brightened Image")
 plt.axis("off")
 plt.show()
+
 ```
 
 #### 16. Create brighter and darker images.
 ```python
-#img_brighter = cv2.add(img, matrix)
-#img_darker = cv2.subtract(img, matrix)
-img_bright = cv2.convertScaleAbs(img_bgr3, alpha=1, beta=50)
-img_dark = cv2.convertScaleAbs(img_bgr3, alpha=1, beta=-50)
-plt.figure(figsize=(10,5))
-
-plt.subplot(1,2,1)
-plt.imshow(img_bright[:,:,::-1])
-plt.title("Brighter Image")
-plt.axis("off")
-
-plt.subplot(1,2,2)
-plt.imshow(img_dark[:,:,::-1])
-plt.title("Darker Image")
-plt.axis("off")
-
-plt.show()
+# Create a matrix of ones (with data type float64)
+Matrix = np.ones(BoyColor.shape, dtype = "uint8") * 50
+img_bright = cv2.add(BoyColor, Matrix)
+img_dark = cv2.subtract(BoyColor, Matrix)
 ```
 
 #### 17. Display the images (Original Image, Darker Image, Brighter Image).
 ```python
-plt.figure(figsize=(15,5))
-
-# Original Image
-plt.subplot(1,3,1)
-plt.imshow(img_bgr3[:,:,[2,1,0]])
-plt.title("Original Image")
-plt.axis("off")
-
-# Darker Image
-plt.subplot(1,3,2)
-plt.imshow(img_dark[:,:,[2,1,0]])
-plt.title("Darker Image")
-plt.axis("off")
-
-# Brighter Image
-plt.subplot(1,3,3)
-plt.imshow(img_bright[:,:,[2,1,0]])
-plt.title("Brighter Image")
-plt.axis("off")
-
+plt.figure(figsize = (20, 18))
+plt.subplot(1, 3, 1), plt.imshow(BoyColor), plt.title("Original Image"), plt.axis("off")
+plt.subplot(1, 3, 2), plt.imshow(img_bright), plt.title("Bright Image"), plt.axis("off")
+plt.subplot(1, 3, 3), plt.imshow(img_dark), plt.title("Dark Image"), plt.axis("off")
 plt.show()
 ```
 
 #### 18. Modify the image contrast.
 ```python
-# Create two higher contrast images using the 'scale' option with factors of 1.1 and 1.2 (without overflow fix)
-matrix1 = np.ones(img_bgr3.shape, dtype="float32") * 1.1
-matrix2 = np.ones(img_bgr3.shape, dtype="float32") * 1.2
-
-img_higher1 = img_bgr3 * matrix1
-img_higher2 = img_bgr3 * matrix2
+BoyHigh1 = BoyColor * 1.1
+BoyHigh2 = BoyColor * 1.2
 ```
 #### 19. Display the images (Original, Lower Contrast, Higher Contrast).
-```python
-matrix_low = np.ones(img_bgr3.shape, dtype="float32") * 0.8
-img_lower = (img_bgr3 * matrix_low).astype('uint8')
-
-matrix_high = np.ones(img_bgr3.shape, dtype="float32") * 1.2
-img_higher = (img_bgr3 * matrix_high).astype('uint8')
-plt.figure(figsize=(12,5))
-
-plt.subplot(1,3,1)
-plt.imshow(img_bgr3[:,:,::-1])
-plt.title("Original Image")
-plt.axis("off")
-
-plt.subplot(1,3,2)
-plt.imshow(img_lower[:,:,::-1])
-plt.title("Lower Contrast")
-plt.axis("off")
-
-plt.subplot(1,3,3)
-plt.imshow(img_higher1[:,:,::-1])   
-plt.title("Higher Contrast")
-plt.axis("off")
-
+```
+plt.figure(figsize = (20, 18))
+plt.subplot(1,3,1), plt.imshow(BoyColor), plt.title("Original"), plt.axis("off")
+plt.subplot(1,3,2), plt.imshow(BoyHigh1.clip(0, 255).astype('uint8')), plt.title("Contrast 1.1"), plt.axis("off")
+plt.subplot(1,3,3), plt.imshow(BoyHigh2.clip(0, 255).astype('uint8')), plt.title("Contrast 1.2"), plt.axis("off")
+plt.show()
 ```
 
 #### 20. Split the image (boy.jpg) into the B,G,R components & Display the channels.
@@ -313,23 +250,11 @@ plt.show()
 ```
 #### 23. Merged the H, S, V, displays along with original image.
 ```python
-img_hsv = cv2.cvtColor(img_bgr3, cv2.COLOR_BGR2HSV)
-h, s, v = cv2.split(img_hsv)
-img_hsv_merged = cv2.merge([h, s, v])
-img_bgr_restored = cv2.cvtColor(img_hsv_merged, cv2.COLOR_HSV2BGR)
+MergedBoyHSV = cv2.merge((h, s, v))
+OriginalImage = cv2.cvtColor(MergedBoyHSV, cv2.COLOR_HSV2RGB)
 
-plt.figure(figsize=(10,5))
-
-plt.subplot(1,2,1)
-plt.imshow(img_bgr3[:,:,::-1])
-plt.title("Original Image")
+plt.imshow(OriginalImage)
 plt.axis("off")
-
-plt.subplot(1,2,2)
-plt.imshow(img_bgr_restored[:,:,::-1])
-plt.title("Merged HSV Image")
-plt.axis("off")
-
 plt.show()
 ```
 
